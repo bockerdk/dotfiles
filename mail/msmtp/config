@@ -1,0 +1,15 @@
+defaults
+auth on
+protocol smtp
+tls on
+tls_starttls off
+
+account startmail
+host smtp.startmail.com
+port 465
+
+from ###
+user ###
+password ###
+
+account default: startmail

@@ -1,0 +1,45 @@
+[user]
+    name  = bockerdk
+    email = public@bocker.dk
+[color]
+    ui = true
+[color "diff"]
+    meta = blue
+[core]
+    excludesfile = ~/.config/git/globalignore
+[push]
+    default = simple
+[alias]
+    ci   = commit
+    cv   = commit --verbose
+    ca   = commit --amend --no-edit
+    l    = log
+    lg   = log --graph
+    lo   = log --oneline
+    lgo  = log --oneline --graph
+    ls   = log --pretty=short
+    lgs  = log --pretty=short --graph
+    lvv  = log --pretty=fuller
+    lgvv = log --pretty=fuller --graph
+    lv   = log --pretty=short
+    lgv  = log --pretty=short --graph
+    lc   = log ORIG_HEAD.. --stat --no-merges
+    ll   = log --date=local
+    llg  = log --date=local --graph
+    b    = branch
+    bs   = branch -av
+    d    = diff
+    dm   = diff master
+    dc   = diff --cached
+    ds   = diff --stat
+    dl   = diff HEAD~
+    bn   = checkout -b
+    co   = checkout
+    undo = reset --hard
+    st   = status
+    s    = status -s
+    p    = push
+[help]
+    autocorrect = 0
+[merge]
+    tool = nvim -d

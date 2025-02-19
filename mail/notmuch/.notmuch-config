@@ -1,0 +1,10 @@
+[database]
+path=~/.mail
+
+[user]
+name=###
+primary_email=###
+
+[new]
+[search]
+[maildir]

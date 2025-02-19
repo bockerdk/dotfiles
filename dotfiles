@@ -1,0 +1,272 @@
+#!/usr/bin/env bash
+
+##################################################
+# Print help information.
+#
+# Globals:
+#   home_dirs
+#   xdg_config_dirs
+# Arguments:
+#   None
+# Outputs:
+#   Writes help information to stdout
+##################################################
+print_help() {
+    echo "Dotfiles setup script"
+    echo
+    echo "Usage: dotfiles COMMAND [OPTION]... [DOTFILE]..."
+    echo
+    echo "Commands:"
+    echo "link         Install dotfiles using symbolic links"
+    echo "copy         Install dotfiles by copying"
+    echo "remove       Remove dotfiles"
+    echo
+    echo "Options:"
+    echo "-i           Interactive mode"
+    echo "-d           Dry run"
+    echo
+    echo "Dotfiles:"
+    echo "Run command for one or more dotfiles (default: all)"
+    echo "Available dotfiles: ${home_dirs[*]} ${xdg_config_dirs[*]}"
+    echo
+}
+
+##################################################
+# Parse arguments
+#
+# Globals:
+#   cmd
+#   operation
+#   interactive
+#   dry_run
+# Arguments:
+#   None
+##################################################
+parse_args() {
+    interactive=false
+    dry_run=false
+
+    # Handle commands
+    case "$1" in
+    link)
+        cmd="ln -snf"
+        operation="install"
+        ;;
+    copy)
+        cmd="cp -r"
+        operation="install"
+        ;;
+    remove)
+        cmd="rm -rf"
+        operation="uninstall"
+        ;;
+    *)
+        print_help
+        exit 0
+        ;;
+    esac
+
+    shift
+
+    # Handle options
+    while getopts idf flag; do
+        case "${flag}" in
+        i) interactive=true ;;
+        d) dry_run=true ;;
+        *)
+            print_help
+            exit 0
+            ;;
+        esac
+    done
+
+    # Shift through options args
+    shift $((OPTIND - 1))
+
+    # Handle dotfiles
+    if [ $# -gt 0 ]; then
+        home_dirs=()
+        home_files=()
+        tmp_xdg_config_dirs=()
+
+        while [ $# -gt 0 ]; do
+            case "$1" in
+            bash)
+                home_dirs=("bash")
+                set_home_files
+                ;;
+            *)
+                if [[ "${xdg_config_dirs[*]}" =~ $1 ]]; then
+                    tmp_xdg_config_dirs+=("$1")
+                else
+                    print_help
+                    exit 0
+                fi
+                ;;
+            esac
+            shift
+        done
+
+        xdg_config_dirs=("${tmp_xdg_config_dirs[@]}")
+    fi
+}
+
+##################################################
+# Run `$cmd` (link, copy, remove) on `$source`
+#
+# Globals:
+#   cmd
+#   operation
+#   source
+#   target
+# Arguments:
+#   None
+##################################################
+run_on_target() {
+    if [ $operation = "install" ]; then
+        if [ -e "$target"/"$(basename "$source")" ]; then
+            echo "$target/$(basename "$source") already exists, skipping..."
+        else
+            if [ "$dry_run" = true ]; then
+                echo "DRY: $cmd \"$PWD/$source\" \"$target/$(basename \""$source"\")"
+            else
+                $cmd "$PWD/$source" "$target/$(basename "$source")"
+                echo "$target/$(basename "$source") installed"
+            fi
+        fi
+    fi
+    if [ $operation = "uninstall" ]; then
+        $cmd "$target"/"$(basename "$source")"
+        echo "$target/$(basename "$source") uninstalled"
+    fi
+}
+
+##################################################
+# Run `$cmd` on each directory/file in array
+#
+# Globals:
+#   source
+#   interactive
+#   interactive_action
+# Arguments:
+#   Target directory
+#   Array of directories/files
+##################################################
+run() {
+    local target=$1
+    shift
+    for source in "$@"; do
+        if [ $interactive = true ]; then
+            promt_user
+            if [ "$interactive_action" = true ]; then
+                run_on_target
+            fi
+        else
+            run_on_target
+        fi
+    done
+}
+
+##################################################
+# Promt user
+#
+# Globals:
+#   source
+#   operation
+#   interactive_action
+# Arguments:
+#   None
+##################################################
+promt_user() {
+    while true; do
+        read -n1 -rp "$operation $(basename "$source")? (y/n) " yn
+        echo
+        case $yn in
+        [Yy]*)
+            interactive_action=true
+            break
+            ;;
+        [Nn]*)
+            interactive_action=false
+            break
+            ;;
+        *) echo "Please answer (y/n)" ;;
+        esac
+    done
+
+}
+
+##################################################
+# Sets home_files based on home_dirs
+#
+# Globals:
+#   home_dirs
+# Arguments:
+#   None
+##################################################
+set_home_files() {
+    for home_dir in "${home_dirs[@]}"; do
+        for home_file in ./"$home_dir"/.*; do
+            home_files+=("$home_file")
+        done
+    done
+}
+
+install_scripts() {
+    mkdir -p ~/.local/bin
+    ln -snf "$(pwd)"/scripts/* ~/.local/bin
+}
+
+##################################################
+# Program entry point
+#
+# Arguments:
+# Script invocation arguments
+##################################################
+main() {
+    # Script must be run from inside it's directory
+    if [ ! -f "$(basename "$0")" ]; then
+        echo "Script must be run from inside it's directory"
+        exit 1
+    fi
+
+    # Directories containing dotfiles that must be in $HOME
+    home_dirs=("bash")
+
+    # Directories containing dotfiles that can live in $XDG_CONFIG_HOME
+    # Note: this is the set difference of $PWD/*/ and $home_dirs$
+    xdg_config_dirs=($(echo */ "${home_dirs[@]}" |
+        tr '[:space:]' '\n' |
+        tr -d '/' |
+        sort |
+        uniq -u))
+
+    # Set config_dir
+    local config_dir
+    if [[ -z "${XDG_CONFIG_HOME}" ]]; then
+        config_dir="$HOME/.config"
+    else
+        config_dir="${XDG_CONFIG_HOME}"
+    fi
+
+    # Create config_dir if it doesn't exist
+    mkdir -p "$config_dir"
+
+    # Collect all files in $home_dirs to array
+    home_files=()
+    set_home_files
+
+    # Parse arguments (sets globals $cmd, $operation, $interactive)
+    parse_args "$@"
+
+    # Run on $HOME
+    run "$HOME" "${home_files[@]}"
+
+    # Run on XDG_CONFIG_DIR
+    run "$config_dir" "${xdg_config_dirs[@]}"
+
+    # Deploy scripts (TODO: make this nicer)
+    install_scripts
+}
+
+main "$@"
