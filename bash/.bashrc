@@ -17,3 +17,5 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
+
+alias t='tmux attach || tmux new-session -s home -c $HOME'
