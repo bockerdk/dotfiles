@@ -13,7 +13,10 @@ else
     config_dir="${XDG_CONFIG_HOME}"
 fi
 
-# Create bin directory
+# Create config directory if missing
+mkdir -p $config_dir
+
+# Create bin directory if missing
 mkdir -p $HOME/.local/bin
 
 # Alacritty
