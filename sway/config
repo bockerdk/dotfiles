@@ -7,11 +7,12 @@ set $left h
 set $down j
 set $up k
 set $right l
-set $term alacritty
+set $term foot
 set $www firefox
 set $menu bemenu-run -i
 
 # Key bindings
+bindsym $mod+Shift+b border toggle
 bindsym $mod+Return exec $term
 bindsym $mod+Shift+Return exec $www
 bindsym $mod+Shift+q kill
@@ -80,7 +81,7 @@ input * xkb_options caps:none
 mouse_warping container
 focus_follows_mouse no
 default_border none
-include /etc/sway/config.d/*
+Include /etc/sway/config.d/*
 
 # Touchpad
 input type:touchpad {
@@ -90,13 +91,14 @@ input type:touchpad {
 
 # Status Bar:
 bar {
+   mode hide
    position top
    colors {
        statusline #ffffff
        background #323232
        inactive_workspace #32323200 #32323200 #5c5c5c
    }
-   status_command while ~/.config/sway/status.sh; do sleep 5; done
+   # status_command while ~/.config/sway/status.sh; do sleep 5; done
 }
 
 # Idle lock (requires sway idle)

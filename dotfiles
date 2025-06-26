@@ -13,11 +13,14 @@ else
     config_dir="${XDG_CONFIG_HOME}"
 fi
 
-# Bin directory
+# Create bin directory
 mkdir -p $HOME/.local/bin
 
 # Alacritty
-ln -snf $PWD/alacritty $config_dir/
+#ln -snf $PWD/alacritty $config_dir/
+
+# Foot
+ln -snf $PWD/foot $config_dir/
 
 # Bash
 ln -snf $PWD/bash/.bash_profile $HOME/
