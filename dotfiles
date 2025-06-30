@@ -15,9 +15,13 @@ fi
 
 # Create config directory if missing
 mkdir -p $config_dir
-
 # Create bin directory if missing
 mkdir -p $HOME/.local/bin
+# Create font directory if missing
+mkdir -p $HOME/.local/share/fonts
+
+# Fonts
+# TODO
 
 # Alacritty
 #ln -snf $PWD/alacritty $config_dir/
