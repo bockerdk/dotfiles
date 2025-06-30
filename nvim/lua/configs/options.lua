@@ -1,0 +1,17 @@
+vim.o.completeopt = "menu,menuone,popup,fuzzy"
+vim.o.laststatus = 3
+vim.o.termguicolors = true
+vim.o.pumheight = 10
+vim.o.signcolumn = 'yes:1'
+vim.o.wrap = false
+vim.o.list = true
+vim.o.confirm = true
+vim.g.netrw_banner = 0
+vim.g.netrw_liststyle = 3
+vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.ignorecase = true
+vim.o.smartcase = true
+-- vim.o.foldlevel = 99
+-- vim.o.foldmethod = "expr"
+-- vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"

@@ -12,15 +12,20 @@ if [[ -z "${XDG_CONFIG_HOME}" ]]; then
 else
     config_dir="${XDG_CONFIG_HOME}"
 fi
+# Set bin directory
+bin_dir="$HOME/.local/bin"
+# Set font directory
+font_dir="$HOME/.local/share/fonts"
 
 # Create config directory if missing
 mkdir -p $config_dir
-
 # Create bin directory if missing
-mkdir -p $HOME/.local/bin
+mkdir -p $bin_dir
+# Create font directory if missing
+mkdir -p $font_dir
 
-# Alacritty
-#ln -snf $PWD/alacritty $config_dir/
+# Fonts
+# cp $PWD/res/fonts/* $font_dir
 
 # Foot
 ln -snf $PWD/foot $config_dir/

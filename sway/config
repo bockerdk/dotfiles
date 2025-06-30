@@ -1,5 +1,5 @@
 # Pure wayland
-xwayland disable
+xwayland enable
 
 # Variables
 set $mod Mod4
@@ -95,10 +95,9 @@ bar {
    position top
    colors {
        statusline #ffffff
-       background #323232
+       background #000000
        inactive_workspace #32323200 #32323200 #5c5c5c
    }
-   # status_command while ~/.config/sway/status.sh; do sleep 5; done
 }
 
 # Idle lock (requires sway idle)
