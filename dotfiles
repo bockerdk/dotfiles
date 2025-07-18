@@ -49,3 +49,6 @@ ln -snf $PWD/sway $config_dir/
 # Tmux
 ln -snf $PWD/tmux $config_dir/
 ln -snf $PWD/tmux/txs $HOME/.local/bin/
+
+# Emacs
+ln -snf $PWD/emacs $config_dir/
