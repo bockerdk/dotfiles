@@ -75,7 +75,7 @@ mode "resize" {
 
 # Keyboard layout
 input *	xkb_layout us
-input * xkb_options caps:none
+input * xkb_options ctrl:nocaps
 
 # Misc
 mouse_warping container
