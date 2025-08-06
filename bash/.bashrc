@@ -18,5 +18,4 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
 # Tmux launcher
-# alias t='tmux attach || tmux new-session txs'
 alias t='tmux attach || txs'
