@@ -1,3 +1,32 @@
+;;; helpers
+(defun bocker/toggle-unique-buffer (buffer-name prog &optional prog-args)
+  "Toggle a unique buffer specified by BUFFER-NAME.
+If the buffer exists, switch to it.
+If the buffer is in focus and is the sole window, bury the buffer.
+If the buffer is in focus and other windows exist, delete the window.
+If the buffer does not exist, create it using PROG and PROG-ARGS."
+  (let ((current-window (selected-window)))
+    (cond
+     ;; The buffer is in focus
+     ((string= buffer-name (buffer-name (window-buffer current-window)))
+      (if (one-window-p)
+          ;; Bury the buffer if it's the only window
+          (bury-buffer)
+        ;; Delete window if it's not the only one
+        (delete-window current-window)))
+
+     ;; If the buffer exists but is not shown, switch to it
+     ((get-buffer buffer-name)
+      (switch-to-buffer buffer-name))
+
+     ;; If the buffer does not exist, create it
+     (t
+      (if prog-args
+          ;; Call the program with arguments
+          (apply prog prog-args)
+        ;; Call the program without arguments
+        (funcall prog))))))
+
 ;;; use-package
 (use-package use-package
   :custom
@@ -11,6 +40,7 @@
 ;;; rebinds
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
 (global-set-key (kbd "M-o") 'other-window)
+(global-set-key (kbd "C-c s") 'scratch-buffer)
 (global-set-key (kbd "C-c I") (lambda () (interactive) (find-file user-init-file)))
 (global-set-key (kbd "C-c Q") 'restart-emacs)
 (global-set-key (kbd "M-u") 'upcase-dwim)
@@ -20,9 +50,6 @@
 ;;; basics
 (setq use-short-answers t)
 (delete-selection-mode)
-(add-to-list 'save-some-buffers-action-alist
-             (list "d" (lambda (buffer)
-                         (diff-buffer-with-file (buffer-file-name buffer)))))
 (setq next-screen-context-lines 10)
 (setq fill-column 78)
 (auto-fill-mode)
@@ -42,6 +69,9 @@
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 (setq create-lockfiles nil)
+(add-to-list 'save-some-buffers-action-alist
+             (list "d" (lambda (buffer)
+                         (diff-buffer-with-file (buffer-file-name buffer)))))
 
 ;;; help
 (use-package help
@@ -55,12 +85,20 @@
   (switch-to-buffer-obey-display-actions t)
   (display-buffer-alist
    '(
+     ("\\*ansi-term\\*"
+      (display-buffer-at-bottom)
+      (window-height . 0.50)
+      (side . bottom)
+      (slot . 0)
+      ;; (window-parameters . ((mode-line-format . none)))
+      )
      ("\\*eshell\\*"
       (display-buffer-at-bottom)
       (window-height . 0.50)
       (side . bottom)
       (slot . 0)
-      (window-parameters . ((mode-line-format . none))))
+      ;; (window-parameters . ((mode-line-format . none)))
+      )
      ("\\*Proced\\*"
       (display-buffer-in-side-window)
       (window-height . 0.50)
@@ -208,20 +246,27 @@
   (proced-descent t)
   (proced-filter 'user))
 
+;;; ansi-term
+(defun bocker/ansi-term ()
+  "Toggle ansi-term buffer"
+  (interactive)
+  (bocker/toggle-unique-buffer "*ansi-term*" 'ansi-term '("/bin/bash")))
+
+(defun bocker/ansi-term-mappings ()
+  "Set up key bindings for ansi-term"
+  (define-key term-raw-map (kbd "C-c t") 'bocker/ansi-term))
+
+(use-package term
+  :hook
+  (term-load-hook . bocker/ansi-term-mappings)
+  :bind
+  ("C-c t" . bocker/ansi-term))
+
 ;;; eshell
 (defun bocker/eshell ()
+  "Toggle eshell buffer"
   (interactive)
-  (let ((eshell "*eshell*"))
-    (cond
-     ;; eshell in focus -> delete window
-     ((string= "*eshell*" (buffer-name (window-buffer (selected-window))))
-      (delete-window (selected-window)))
-     ;; eshell exist but not shown -> show
-     ((get-buffer "*eshell*")
-      (switch-to-buffer "*eshell*"))
-     ;; eshell does not exist -> create
-     ((not (get-buffer "*eshell*"))
-      (eshell)))))
+  (bocker/toggle-unique-buffer "*eshell*" 'eshell))
 
 (use-package eshell
   :custom
