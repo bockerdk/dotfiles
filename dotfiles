@@ -37,9 +37,6 @@ ln -snf $PWD/bash/.bashrc $HOME/
 # Git
 ln -snf $PWD/git $config_dir/
 
-# Mail
-# TODO
-
 # Neovim
 ln -snf $PWD/nvim $config_dir/
 
