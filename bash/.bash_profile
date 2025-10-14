@@ -3,6 +3,7 @@
 # Basic environment variables
 EDITOR=$(command -v nvim)
 export EDITOR
+export MANPAGER="nvim +Man!"
 BROWSER=$(command -v firefox)
 export BROWSER
 
