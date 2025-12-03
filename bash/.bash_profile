@@ -16,6 +16,11 @@ else
 fi
 export CC
 
+# Rust
+if [ -f $HOME/.cargo/env ]; then
+    source "$HOME/.cargo/env"
+fi
+
 # Add to path
 export PATH="$HOME/.local/bin:$PATH"
 
