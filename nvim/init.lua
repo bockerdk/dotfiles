@@ -12,7 +12,6 @@ vim.o.expandtab = true
 vim.o.shiftwidth = 4
 vim.o.ignorecase = true
 vim.o.smartcase = true
-vim.o.cursorline = false
 vim.o.updatetime = 2000
 vim.o.winborder = 'rounded'
 vim.opt.mouse = ''
@@ -39,7 +38,6 @@ vim.keymap.set("t", "<C-[>", [[<C-\><C-n>]])
 
 require('bocker-terminal').setup("<F10>", "<C-F10>", "<F11>", "<C-F11>", { width = 0.95, height = 0.95 })
 require('bocker-colorscheme').setup(true)
-require('bocker-statusline')
 
 -- Autocmds
 vim.api.nvim_create_autocmd("TextYankPost", {
