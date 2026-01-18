@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Check if command is availble
+check_cmd () {
+    if ! command -v $1 &>/dev/null; then
+        echo -e "\tdependency: $1 missing";
+    fi
+}
+
 # Script must be run from inside it's directory
 if [ ! -f "$(basename "$0")" ]; then
     echo "Script must be run from inside it's directory"
@@ -47,19 +54,21 @@ ln -snf $PWD/nvim $config_dir/
 
 # Sway
 echo "Installing sway..."
+check_cmd swayidle
+check_cmd swaylock
+check_cmd swaybg
+check_cmd wmenu
 ln -snf $PWD/sway $config_dir/
 
 # Tmux
 echo "Installing tmux..."
-if ! command -v fzy &>/dev/null; then
-    echo -e "\tdependency: fzy not found";
-fi
+check_cmd fzy
 ln -snf $PWD/tmux $config_dir/
 ln -snf $PWD/tmux/txs $HOME/.local/bin/
 
 # Emacs
-echo "Installing emacs..."
-ln -snf $PWD/emacs $config_dir/
+# echo "Installing emacs..."
+# ln -snf $PWD/emacs $config_dir/
 
 # GDB
 echo "Installing gdb..."
