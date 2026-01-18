@@ -60,7 +60,8 @@ local function set_groups()
         VertSplit = { fg = colorscheme.windowBorder, bg = bg },
         Winseparator = { link = 'VertSplit' },
         SignColumn = { link = 'Normal' },
-        Folded = { fg = colorscheme.mainText, bg = colorscheme.popupBackground },
+        -- Folded = { fg = colorscheme.mainText, bg = colorscheme.popupBackground },
+        Folded = { fg = colorscheme.mainText, bg = colorscheme.editorBackground },
         FoldColumn = { link = 'SignColumn' },
         IncSearch = {
             bg = utils.mix(
@@ -93,8 +94,8 @@ local function set_groups()
         Question = { fg = colorscheme.syntaxFunction },
         QuickFixLine = { fg = colorscheme.syntaxFunction },
         SpecialKey = { fg = colorscheme.syntaxOperator },
-        StatusLine = { fg = colorscheme.mainText, bg = bg },
-        -- StatusLine = { fg = colorscheme.mainText, bg = colorscheme.windowBorder },
+        -- StatusLine = { fg = colorscheme.mainText, bg = bg },
+        StatusLine = { fg = colorscheme.mainText, bg = '#181818' },
         StatusLineNC = {
             fg = colorscheme.inactiveText,
             bg = colorscheme.sidebarBackground,
