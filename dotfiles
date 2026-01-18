@@ -25,7 +25,7 @@ mkdir -p $bin_dir
 mkdir -p $font_dir
 
 # Fonts
-cp $PWD/fonts/* $font_dir
+cp $PWD/res/fonts/* $font_dir
 
 # Foot
 ln -snf $PWD/foot $config_dir/
