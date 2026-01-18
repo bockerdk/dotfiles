@@ -25,27 +25,49 @@ mkdir -p $bin_dir
 mkdir -p $font_dir
 
 # Fonts
+echo "Installing fonts..."
 cp $PWD/fonts/* $font_dir
 
 # Foot
+echo "Installing foot..."
 ln -snf $PWD/foot $config_dir/
 
 # Bash
+echo "Installing bash..."
 ln -snf $PWD/bash/.bash_profile $HOME/
 ln -snf $PWD/bash/.bashrc $HOME/
 
 # Git
+echo "Installing git..."
 ln -snf $PWD/git $config_dir/
 
 # Neovim
+echo "Installing neovim..."
 ln -snf $PWD/nvim $config_dir/
 
 # Sway
+echo "Installing sway..."
 ln -snf $PWD/sway $config_dir/
 
 # Tmux
+echo "Installing tmux..."
+if ! command -v fzf &>/dev/null; then
+    echo -e "\tdependency: fzf not found";
+fi
 ln -snf $PWD/tmux $config_dir/
 ln -snf $PWD/tmux/txs $HOME/.local/bin/
 
 # Emacs
+echo "Installing emacs..."
 ln -snf $PWD/emacs $config_dir/
+
+# GDB
+echo "Installing gdb..."
+ln -snf $PWD/gdb $config_dir/
+
+# Mail
+## Deps:
+##      mbsync
+##      msmtp
+##      notmuch
+##      systemd file
