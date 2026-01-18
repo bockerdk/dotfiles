@@ -26,7 +26,7 @@ mkdir -p $font_dir
 
 # Fonts
 echo "Installing fonts..."
-cp $PWD/fonts/* $font_dir
+cp $PWD/res/fonts/* $font_dir
 
 # Foot
 echo "Installing foot..."
@@ -51,8 +51,8 @@ ln -snf $PWD/sway $config_dir/
 
 # Tmux
 echo "Installing tmux..."
-if ! command -v fzf &>/dev/null; then
-    echo -e "\tdependency: fzf not found";
+if ! command -v fzy &>/dev/null; then
+    echo -e "\tdependency: fzy not found";
 fi
 ln -snf $PWD/tmux $config_dir/
 ln -snf $PWD/tmux/txs $HOME/.local/bin/

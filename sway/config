@@ -1,5 +1,8 @@
 # Xwayland
-xwayland enable
+xwayland disabled
+
+# Font
+font pango:Maple Mono NF 12
 
 # Variables
 set $mod Mod4
@@ -9,7 +12,7 @@ set $up k
 set $right l
 set $term foot
 set $www firefox
-set $menu bemenu-run -i
+set $menu wmenu-run
 
 # Launchers
 bindsym $mod+Return exec $term
@@ -102,18 +105,18 @@ bar {
    colors {
        statusline #ffffff
        background #000000
-       focused_workspace #000000 #000000 #00bfff
+       focused_workspace #000000 #000000 #b3f6c0
        inactive_workspace #000000 #000000 #ffffff
    }
-   status_command while date +'%Y-%m-%d %I:%M'; do sleep 30; done
+   status_command while ~/.config/sway/status; do sleep 1; done
 }
 
 # Wallpaper
-output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+output * bg ~/Projects/dotfiles/res/wallpaper.png fill
 
 # Idle management daemon (requires swayidle)
 exec swayidle -w \
-         timeout 600 'swaylock -f -c 000000' \
+         timeout 300 'swaylock -f -c 000000' \
          timeout 1200 'swaymsg "output * dpms off"' \
               resume 'swaymsg "output * dpms on"' \
          before-sleep 'swaylock -f -c 000000'
@@ -122,5 +125,5 @@ exec swayidle -w \
 bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
 bindsym XF86MonBrightnessUp exec brightnessctl set +5%
 
-# Misc
-Include /etc/sway/config.d/*
+# Windows that should open in floating mode
+for_window [app_id="hello-sdl3"] floating enable
