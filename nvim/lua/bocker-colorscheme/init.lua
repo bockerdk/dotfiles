@@ -25,7 +25,6 @@ local function set_terminal_colors()
 end
 
 local function set_groups()
-    -- local bg = config.transparent and 'NONE' or colorscheme.editorBackground
     local bg = colorscheme.editorBackground
     local diff_add =
         utils.shade(colorscheme.successText, 0.5, colorscheme.editorBackground)

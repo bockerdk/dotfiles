@@ -1,12 +1,10 @@
-local config = require 'bocker-colorscheme.config'
-
 local colorscheme = {
     standardWhite = '#ffffff',
     standardBlack = '#000000',
 }
 
 if vim.o.background == 'light' then
-    colorscheme.editorBackground = config.transparent and 'none' or '#ffffff'
+    colorscheme.editorBackground = colorscheme.standardWhite
     colorscheme.sidebarBackground = '#dddddd'
     colorscheme.popupBackground = '#f6f6f6'
     colorscheme.floatingWindowBackground = '#e0e0e0'
@@ -40,7 +38,7 @@ if vim.o.background == 'light' then
     colorscheme.foregroundEmphasis = '#000000'
     colorscheme.terminalGray = '#333333'
 else
-    colorscheme.editorBackground = colorscheme.standardBlack -- config.transparent and 'none' or '#212121'
+    colorscheme.editorBackground = colorscheme.standardBlack
     colorscheme.sidebarBackground = '#1a1a1a'
     colorscheme.popupBackground = '#292929'
     colorscheme.floatingWindowBackground = colorscheme.standardBlack --'#383838'

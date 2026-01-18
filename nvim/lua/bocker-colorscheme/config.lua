@@ -2,7 +2,6 @@ local M = {}
 
 M.defaults = {
     theme = "dark",
-    transparent = false,
     italics = {
         comments = false,
         keywords = false,
