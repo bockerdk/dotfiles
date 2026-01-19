@@ -94,8 +94,8 @@ local function set_groups()
         Question = { fg = colorscheme.syntaxFunction },
         QuickFixLine = { fg = colorscheme.syntaxFunction },
         SpecialKey = { fg = colorscheme.syntaxOperator },
-        -- StatusLine = { fg = colorscheme.mainText, bg = bg },
-        StatusLine = { fg = colorscheme.mainText, bg = '#181818' },
+        StatusLine = { fg = colorscheme.mainText, bg = bg },
+        -- StatusLine = { fg = colorscheme.mainText, bg = '#181818' },
         StatusLineNC = {
             fg = colorscheme.inactiveText,
             bg = colorscheme.sidebarBackground,
