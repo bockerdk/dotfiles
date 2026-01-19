@@ -3,8 +3,6 @@
     email = public@bocker.dk
 [color]
     ui = true
-[color "diff"]
-    meta = blue
 [core]
     excludesfile = ~/.config/git/globalignore
 [push]
@@ -42,4 +40,4 @@
 [help]
     autocorrect = 0
 [merge]
-    tool = nvim -d
+    tool = nvimdiff2
