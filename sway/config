@@ -108,11 +108,11 @@ bar {
        focused_workspace #000000 #000000 #b3f6c0
        inactive_workspace #000000 #000000 #ffffff
    }
-   status_command while ~/.config/sway/status; do sleep 1; done
+   status_command while ~/.config/sway/status; do sleep 30; done
 }
 
 # Wallpaper
-output * bg ~/Projects/dotfiles/res/wallpaper.png fill
+output * bg ~/.local/share/wallpapers/01.jpg fill
 
 # Idle management daemon (requires swayidle)
 exec swayidle -w \
