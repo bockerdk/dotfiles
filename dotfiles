@@ -2,8 +2,10 @@
 
 # Check if command is availble
 check_cmd () {
-    if ! command -v $1 &>/dev/null; then
-        echo -e "\tdependency: $1 missing";
+    if command -v $1 &>/dev/null; then
+        echo -e "  $1: ok";
+    else
+        echo -e "  $1: not found";
     fi
 }
 
@@ -19,7 +21,6 @@ if [[ -z "${XDG_CONFIG_HOME}" ]]; then
 else
     config_dir="${XDG_CONFIG_HOME}"
 fi
-
 # Set bin directory
 bin_dir="$HOME/.local/bin"
 # Set font directory
@@ -36,33 +37,39 @@ mkdir -p $font_dir
 # Create wallpaper directory if missing
 mkdir -p $wallpaper_dir
 
-# Fonts
-echo "Installing fonts..."
+# Resources
+echo "Installing resources"
+## Fonts
+echo -e "  fonts"
 cp $PWD/res/fonts/* $font_dir
-
-# Wallpaper
-echo "Installing wallpaper..."
+## Wallpaper
+echo -e "  wallpapers"
 cp $PWD/res/wallpapers/* $wallpaper_dir
 
 # Foot
-echo "Installing foot..."
+echo "Installing foot"
+check_cmd foot
 ln -snf $PWD/foot $config_dir/
 
 # Bash
-echo "Installing bash..."
+echo "Installing bash"
+check_cmd bash
 ln -snf $PWD/bash/.bash_profile $HOME/
 ln -snf $PWD/bash/.bashrc $HOME/
 
 # Git
-echo "Installing git..."
+echo "Installing git"
+check_cmd git
 ln -snf $PWD/git $config_dir/
 
 # Neovim
-echo "Installing neovim..."
+echo "Installing neovim"
+check_cmd nvim
 ln -snf $PWD/nvim $config_dir/
 
 # Sway
-echo "Installing sway..."
+echo "Installing sway"
+check_cmd sway
 check_cmd swayidle
 check_cmd swaylock
 check_cmd swaybg
@@ -70,17 +77,18 @@ check_cmd wmenu
 ln -snf $PWD/sway $config_dir/
 
 # Tmux
-echo "Installing tmux..."
-check_cmd fzy
+echo "Installing tmux"
+check_cmd tmux
 ln -snf $PWD/tmux $config_dir/
 ln -snf $PWD/tmux/txs $HOME/.local/bin/
 
 # Emacs
-# echo "Installing emacs..."
+# echo "Installing emacs"
 # ln -snf $PWD/emacs $config_dir/
 
 # GDB
-echo "Installing gdb..."
+echo "Installing gdb"
+check_cmd gdb
 ln -snf $PWD/gdb $config_dir/
 
 # Mail
@@ -89,3 +97,7 @@ ln -snf $PWD/gdb $config_dir/
 ##      msmtp
 ##      notmuch
 ##      systemd file
+
+# Optional utilities
+echo "Checking for optional utilities"
+check_cmd jq
