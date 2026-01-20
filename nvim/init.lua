@@ -54,6 +54,14 @@ vim.api.nvim_create_autocmd("TextYankPost", {
         })
     end
 })
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+    desc = "No auto comment",
+    pattern = { '*' },
+    callback = function()
+        vim.opt.formatoptions:remove('r')
+        vim.opt.formatoptions:remove('o')
+    end
+})
 
 -- Extras
 require('bocker-terminal').setup("<F10>", "<C-F10>", "<F11>", "<C-F11>", { width = 0.95, height = 0.95 })
