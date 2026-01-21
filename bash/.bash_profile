@@ -19,8 +19,7 @@ export PKG_CONFIG_PATH=/usr/local/share/pkgconfig:$PKG_CONFIG_PATH
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 
 # C compiler environment variables
-if command -v clang > /dev/null;
-then
+if command -v clang > /dev/null; then
     CC=$(command -v clang)
 else
     CC=$(command -v gcc)
