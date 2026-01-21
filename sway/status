@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 # Date
-date=$(date "+%a %F")
+date=$(date "+%F")
 
 # Clock
 time=$(date "+%H:%M")
@@ -9,7 +9,7 @@ time=$(date "+%H:%M")
 # Battery
 bat_file=/sys/class/power_supply/BAT0/capacity
 if [ -f $bat_file ]; then
-    bat_cap="$(cat $bat_file)%"
+    bat_cap=$(cat $bat_file)
 else
     bat_cap="N/A"
 fi
@@ -18,14 +18,14 @@ fi
 if command -v wpctl > /dev/null; then
     volume="$(wpctl get-volume @DEFAULT_AUDIO_SINK@\
         | cut -d " " -f 2\
-        | cut -d "." -f 2)%"
+        | cut -d "." -f 2)"
 else
     volume="N/A"
 fi
 
 # Brightness
 if command -v brightnessctl > /dev/null; then
-    brightness="$(brightnessctl -P get)%"
+    brightness=$(brightnessctl get)
 else
     brightness="N/A"
 fi
