@@ -1,5 +1,5 @@
 # Xwayland
-xwayland disabled
+xwayland enabled
 
 # Font
 font pango:Maple Mono NF 12
@@ -12,8 +12,8 @@ set $up k
 set $right l
 set $term foot
 set $www firefox
-set $menu wmenu-run -N 181818 -S 181818 -s b3f6c0 \
-    -f "Maple Mono NF SemiBold 12" \
+set $menu wmenu-run -N 000000 -S 000000 -s b3f6c0 \
+    -f "Maple Mono NF Bold 14" \
     -i -l 6 -c -b -w 400
 
 # Launchers
@@ -104,14 +104,14 @@ bindsym $mod+b exec swaymsg bar mode toggle
 bar {
    mode dock
    position top
-   font pango:Maple Mono NF SemiBold 11
+   font pango:Maple Mono NF Bold 12
    colors {
        statusline #ffffff
        background #000000
        focused_workspace #000000 #000000 #b3f6c0
        inactive_workspace #000000 #000000 #ffffff
    }
-   status_command while ~/.config/sway/status; do sleep 5; done
+   status_command while ~/.config/sway/status; do sleep 1; done
 }
 
 # Wallpaper

@@ -1,40 +1,31 @@
 -- Options
+vim.opt.path:append({ '**' })
 vim.opt.wildoptions:append("fuzzy")
-vim.o.complete = "o"
-vim.o.completeopt = "menu,menuone,popup,fuzzy,noselect"
-vim.o.autocomplete = true
-vim.opt.path:append({ ',**/*' })
+-- vim.o.complete = "o"
+-- vim.o.completeopt = "menu,menuone,popup,fuzzy,noselect"
+-- vi.autocomplete = true
 vim.o.laststatus = 3
 vim.o.termguicolors = true
-vim.o.pumheight = 10
+-- vim.o.pumheight = 10
 vim.o.signcolumn = 'yes:1'
 vim.o.wrap = false
 vim.o.list = true
 vim.o.confirm = true
+
 vim.o.expandtab = true
 vim.o.shiftwidth = 4
+
 vim.o.ignorecase = true
 vim.o.smartcase = true
-vim.o.updatetime = 2000
+-- vim.o.updatetime = 2000
 vim.o.winborder = 'rounded'
-vim.opt.mouse = ''
-vim.o.splitbelow = true
-vim.o.splitright = true
+-- vim.opt.mouse = ''
+-- vim.o.splitbelow = true
+-- vim.o.splitright = true
 vim.g.netrw_banner = 0
 vim.g.netrw_liststyle = 3
 vim.g.netrw_winsize = -30
 vim.g.c_syntax_for_h = 1
-
--- Helpers
-local function toggle_qf()
-    local win_id = vim.fn.getqflist({winid = 0}).winid
-    if win_id ~= nil and win_id ~= 0 then
-        vim.cmd 'ccl'
-    else
-        vim.cmd 'copen'
-        vim.cmd 'wincmd p'
-    end
-end
 
 -- Keymaps
 vim.g.mapleader = " "
@@ -55,8 +46,17 @@ vim.keymap.set("n", "<A-k>", ":m .-2<CR>==")
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv")
 vim.keymap.set("n", "<A-o>", "<C-w>w")
-vim.keymap.set("n", "<leader>q", toggle_qf)
 vim.keymap.set("n", "<leader><leader>", "<C-^>")
+vim.keymap.set("n", "<leader>q", function()
+    local win_id = vim.fn.getqflist({winid = 0}).winid
+    if win_id ~= nil and win_id ~= 0 then
+        vim.cmd 'ccl'
+    else
+        vim.cmd 'copen'
+        vim.cmd 'wincmd p'
+    end
+end)
+
 
 -- Autocmds
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -79,4 +79,3 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
 
 -- Extras
 require('bocker-terminal').setup("<F10>", "<C-F10>", "<F11>", "<C-F11>", { width = 1, height = 1 })
-require('bocker-colorscheme').setup(true)

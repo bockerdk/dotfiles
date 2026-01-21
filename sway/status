@@ -1,38 +1,34 @@
 #!/bin/env bash
 
 # Date
-date=$(date "+%F")
-
-# Clock
-time=$(date "+%H:%M")
+date="$(date "+%F %H:%M")"
 
 # Battery
 bat_file=/sys/class/power_supply/BAT0/capacity
 if [ -f $bat_file ]; then
-    bat_cap=$(cat $bat_file)
+    bat_cap="Battery: $(cat $bat_file)"
 else
-    bat_cap="N/A"
+    bat_cap=""
 fi
 
 # Volume
 if command -v wpctl > /dev/null; then
-    volume="$(wpctl get-volume @DEFAULT_AUDIO_SINK@\
+    volume="Volume: $(wpctl get-volume @DEFAULT_AUDIO_SINK@\
         | cut -d " " -f 2\
         | cut -d "." -f 2)"
 else
-    volume="N/A"
+    volume=""
 fi
 
 # Brightness
 if command -v brightnessctl > /dev/null; then
-    brightness=$(brightnessctl get)
+    brightness="Brightness: $(brightnessctl get)"
 else
-    brightness="N/A"
+    brightness=""
 fi
-export CC
 
-echo -e "Brightness: $brightness\
-    Battery: $bat_cap\
-    Volume: $volume\
-    Date: $date\
-    Time: $time"
+echo -e "\
+    $brightness\
+    $bat_cap\
+    $volume\
+    $date"
