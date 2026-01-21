@@ -12,7 +12,9 @@ set $up k
 set $right l
 set $term foot
 set $www firefox
-set $menu wmenu-run -N 000000 -S 181818 -s b3f6c0 -f "Maple Mono NF 14" -l 100
+set $menu wmenu-run -N 181818 -S 181818 -s b3f6c0 \
+    -f "Maple Mono NF SemiBold 12" \
+    -i -l 6 -c -b -w 400
 
 # Launchers
 bindsym $mod+Return exec $term
@@ -97,18 +99,19 @@ input type:touchpad {
     natural_scroll enabled
 }
 
-# Status Bar:
+# Status Bar
 bindsym $mod+b exec swaymsg bar mode toggle
 bar {
    mode dock
    position top
+   font pango:Maple Mono NF SemiBold 11
    colors {
        statusline #ffffff
        background #000000
        focused_workspace #000000 #000000 #b3f6c0
        inactive_workspace #000000 #000000 #ffffff
    }
-   status_command while ~/.config/sway/status; do sleep 30; done
+   status_command while ~/.config/sway/status; do sleep 5; done
 }
 
 # Wallpaper

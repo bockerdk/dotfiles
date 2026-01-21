@@ -1,15 +1,38 @@
 #!/bin/env bash
 
-date_formatted=$(date "+%a %F %H:%M")
-battery_info=$(cat /sys/class/power_supply/BAT0/capacity)
-brightness=$(($(brightnessctl get) / 75))
-# mute=$(awk '{print $2}' <<< "$(pactl list sinks | grep "Mute:")")
-# if [ "$mute" == "no" ]; then
-#     volume=$(awk '{print $5}' <<< "$(pactl list sinks | grep -m 1 "Volume")")
-# else
-#     volume="0%"
-# fi
-volume="50"
+# Date
+date=$(date "+%a %F")
 
-# echo "| P:$battery_info | B:$brightness% | V:$volume | $date_formatted"
-echo "Vol: $volume% | Dim: $brightness% | Bat: $battery_info% | $date_formatted"
+# Clock
+time=$(date "+%H:%M")
+
+# Battery
+bat_file=/sys/class/power_supply/BAT0/capacity
+if [ -f $bat_file ]; then
+    bat_cap="$(cat $bat_file)%"
+else
+    bat_cap="N/A"
+fi
+
+# Volume
+if command -v wpctl > /dev/null; then
+    volume="$(wpctl get-volume @DEFAULT_AUDIO_SINK@\
+        | cut -d " " -f 2\
+        | cut -d "." -f 2)%"
+else
+    volume="N/A"
+fi
+
+# Brightness
+if command -v brightnessctl > /dev/null; then
+    brightness="$(brightnessctl -P get)%"
+else
+    brightness="N/A"
+fi
+export CC
+
+echo -e "Brightness: $brightness\
+    Battery: $bat_cap\
+    Volume: $volume\
+    Date: $date\
+    Time: $time"
