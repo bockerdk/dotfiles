@@ -1,43 +1,35 @@
-;;; helpers
-(defun bocker/toggle-unique-buffer (buffer-name prog &optional prog-args)
-  "Toggle a unique buffer specified by BUFFER-NAME.
-If the buffer exists, switch to it.
-If the buffer is in focus and is the sole window, bury the buffer.
-If the buffer is in focus and other windows exist, delete the window.
-If the buffer does not exist, create it using PROG and PROG-ARGS."
-  (let ((current-window (selected-window)))
-    (cond
-     ;; The buffer is in focus
-     ((string= buffer-name (buffer-name (window-buffer current-window)))
-      (if (one-window-p)
-          ;; Bury the buffer if it's the only window
-          (bury-buffer)
-        ;; Delete window if it's not the only one
-        (delete-window current-window)))
+;;; -*- lexical-binding: t; -*-
 
-     ;; If the buffer exists but is not shown, switch to it
-     ((get-buffer buffer-name)
-      (switch-to-buffer buffer-name))
+;; No frame decorations (no title bar)
+(setq default-frame-alist '((undecorated . t)))
 
-     ;; If the buffer does not exist, create it
-     (t
-      (if prog-args
-          ;; Call the program with arguments
-          (apply prog prog-args)
-        ;; Call the program without arguments
-        (funcall prog))))))
+;; UI
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
 
-;;; use-package
-(use-package use-package
-  :custom
-  (use-package-hook-name-suffix nil)
-  (use-package-always-ensure nil))
+;; Basics
+(setq initial-buffer-choice t)
+(setq use-short-answers t)
+(setq next-screen-context-lines 10)
+(setq fill-column 78)
+(auto-fill-mode)
+(setq tab-always-indent 'complete)
+(setq-default indent-tabs-mode nil)
+(setq initial-scratch-message nil)
+(setq-default x-stretch-cursor t)
+(setq visible-bell nil)
+(setq ring-bell-function 'ignore)
+(setq kill-region-dwim 'emacs-word)
+(setq exchange-point-and-mark-highlight-region nil)
+(column-number-mode)
+(add-to-list 'save-some-buffers-action-alist
+             (list "d" (lambda (buffer)
+                         (diff-buffer-with-file (buffer-file-name buffer)))))
+(setq custom-file (make-temp-file "emacs-custom-"))
+(setq enable-recursive-minibuffers t)
 
-;;; theme
-(global-set-key (kbd "<f1>") 'modus-themes-toggle)
-(load-theme 'modus-operandi 'NO-CONFIRM)
-
-;;; rebinds
+;; Keymaps
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
 (global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "C-c s") 'scratch-buffer)
@@ -47,87 +39,41 @@ If the buffer does not exist, create it using PROG and PROG-ARGS."
 (global-set-key (kbd "M-l") 'downcase-dwim)
 (global-set-key (kbd "M-c") 'capitalize-dwim)
 
-;;; basics
-(setq use-short-answers t)
-(delete-selection-mode)
-(setq next-screen-context-lines 10)
-(setq fill-column 78)
-(auto-fill-mode)
-(setq tab-always-indent 'complete)
-(setq-default indent-tabs-mode nil)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(setq initial-buffer-choice t)
-(setq inhibit-startup-echo-area-message "bocker")
-(setq initial-scratch-message nil)
-(setq-default x-stretch-cursor t)
-(blink-cursor-mode -1)
-(setq visible-bell nil)
-(setq ring-bell-function 'ignore)
-(setq custom-file (make-temp-file "emacs-custom-"))
+;; Enable functionality
+(mapc
+ (lambda (command)
+   (put command 'disabled nil))
+ '(narrow-to-region narrow-to-page))
+
+;; Disable functionality
+(mapc
+ (lambda (command)
+   (put command 'disabled t))
+ '(iconify-frame))
+
+;; Backup/autosave/lockfiles
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 (setq create-lockfiles nil)
-(add-to-list 'save-some-buffers-action-alist
-             (list "d" (lambda (buffer)
-                         (diff-buffer-with-file (buffer-file-name buffer)))))
 
-;;; help
+;; Use-package
+(use-package use-package
+  :custom
+  (use-package-hook-name-suffix nil)
+  (use-package-always-ensure nil))
+
+;; Help
 (use-package help
   :custom
   (help-window-select t)
   (help-window-keep-selected))
 
-;;; window
-(use-package window
-  :custom
-  (switch-to-buffer-obey-display-actions t)
-  (display-buffer-alist
-   '(
-     ("\\*ansi-term\\*"
-      (display-buffer-at-bottom)
-      (window-height . 0.50)
-      (side . bottom)
-      (slot . 0)
-      ;; (window-parameters . ((mode-line-format . none)))
-      )
-     ("\\*eshell\\*"
-      (display-buffer-at-bottom)
-      (window-height . 0.50)
-      (side . bottom)
-      (slot . 0)
-      ;; (window-parameters . ((mode-line-format . none)))
-      )
-     ("\\*Proced\\*"
-      (display-buffer-in-side-window)
-      (window-height . 0.50)
-      (side . bottom)
-      (slot . 0))
-     ("\\*compilation\\*"
-      (display-buffer-in-side-window)
-      (window-height . 0.50)
-      (side . bottom)
-      (slot . 1))
-     )))
-
-;;; winner
+;; Winner mode
 (use-package winner
   :hook
   (after-init-hook . winner-mode))
 
-;;; compile
-(use-package compile
-  :bind
-  ("<f12>" . compile)
-  :custom
-  (compilation-always-kill t)
-  (compilation-scroll-output t)
-  (ansi-color-for-compilation-mode t)
-  :hook
-  (compilation-filter-hook . ansi-color-compilation-filter))
-
-;;; dired
+;; Dired
 (use-package dired
   :hook
   ((dired-mode-hook . dired-hide-details-mode)
@@ -139,11 +85,7 @@ If the buffer does not exist, create it using PROG and PROG-ARGS."
   (dired-kill-when-opening-new-dired-buffer t)
   (dired-dwim-target t))
 
-;;; calendar
-(defvar calendar-week-start-day 1)
-(defvar calendar-date-style 'european)
-
-;;; recentf
+;; Recent files
 (use-package recentf
   :bind ("M-g r" . recentf)
   :custom
@@ -152,92 +94,29 @@ If the buffer does not exist, create it using PROG and PROG-ARGS."
   :hook
   (after-init-hook . recentf-mode))
 
-;;; isearch
-(use-package isearch)
-
-;;; imenu
-(use-package imenu
-  :custom
-  (imenu-auto-rescan t)
-  (imenu-max-item-length 160))
-
-;;; mode-line
-(column-number-mode)
-
-;;; minibuffer
-(use-package minibuffer
-  :custom
-  (completion-styles '(basic partial-completion substring initials))
-  (enable-recursive-minibuffers t)
-  (completion-show-help nil)
-  (completion-show-inline-help t)
-  (completions-detailed t)
-  (completions-format 'horizontal)
-  (completion-ignore-case t)
-  (completion-auto-wrap nil)
-  (read-buffer-completion-ignore-case t)
-  (completion-auto-help 'always)
-  (minibuffer-completion-auto-choose nil)
-  (completion-auto-select 'second-tab)
-  (completions-max-height 10)
+;; Compile
+(use-package compile
   :bind
-  (:map minibuffer-mode-map
-        ("C-n" . minibuffer-next-completion)
-        ("C-p" . minibuffer-previous-completion))
-  (:map completion-in-region-mode-map
-        ("C-n" . minibuffer-next-completion)
-        ("C-p" . minibuffer-previous-completion)))
-
-;;; savehist
-(use-package savehist
-  :config (savehist-mode 1))
-
-;;; eldoc
-(use-package eldoc
-  :init (global-eldoc-mode))
-
-;;; flymake
-(use-package flymake
-  :bind
-  (:map flymake-mode-map
-        ("M-9" . flymake-show-buffer-diagnostics)
-        ("M-8" . flymake-goto-next-error)
-        ("M-7" . flymake-goto-prev-error)))
-
-;;; eglot
-(use-package eglot
+  ("<f12>" . compile)
   :custom
-  (eglot-autoshutdown t)
+  (compilation-always-kill t)
+  (compilation-scroll-output t)
+  (ansi-color-for-compilation-mode t)
   :hook
-  (c-mode-hook . eglot-ensure))
+  (compilation-filter-hook . ansi-color-compilation-filter))
 
-;;; electric pair
-(use-package electric-pair
-  :hook
-  (after-init-hook . electric-pair-mode))
-
-;;; paren
-(use-package paren
-  :hook
-  (after-init-hook . show-paren-mode)
+;; Calendar
+(use-package calendar
   :custom
-  (show-paren-delay 0)
-  (show-paren-style 'parenthesis)
-  (show-paren-context-when-offscreen t))
+  (calendar-week-start-day 1)
+  (calendar-date-style 'european))
 
-;;; webjump
-(use-package webjump
-  :bind
-  ("C-x /" . webjump)
-  :custom
-  (webjump-sites '(("Duck" . [simple-query "www.duckduckgo.com" "www.duckduckgo.com/?q=" ""]))))
+;; Autorevert
+(use-package autorevert
+  :init
+  (global-auto-revert-mode 1))
 
-;;; whitespace
-(use-package whitespace
-  :hook
-  (before-save-hook . whitespace-cleanup))
-
-;;; proced
+;; Proced
 (use-package proced
   :custom
   (proced-enable-color-flag t)
@@ -246,35 +125,72 @@ If the buffer does not exist, create it using PROG and PROG-ARGS."
   (proced-descent t)
   (proced-filter 'user))
 
-;;; ansi-term
-(defun bocker/ansi-term ()
-  "Toggle ansi-term buffer"
-  (interactive)
-  (bocker/toggle-unique-buffer "*ansi-term*" 'ansi-term '("/bin/bash")))
-
-(defun bocker/ansi-term-mappings ()
-  "Set up key bindings for ansi-term"
-  (define-key term-raw-map (kbd "C-c t") 'bocker/ansi-term))
-
-(use-package term
-  :hook
-  (term-load-hook . bocker/ansi-term-mappings)
+;; Flymake
+(use-package flymake
   :bind
-  ("C-c t" . bocker/ansi-term))
+  (:map flymake-mode-map
+        ("M-9" . flymake-show-buffer-diagnostics)
+        ("M-8" . flymake-goto-next-error)
+        ("M-7" . flymake-goto-prev-error)))
 
-;;; eshell
-(defun bocker/eshell ()
-  "Toggle eshell buffer"
-  (interactive)
-  (bocker/toggle-unique-buffer "*eshell*" 'eshell))
+;; Eldoc
+(use-package eldoc
+  :custom
+  (eldoc-echo-area-use-multiline-p nil)
+  (eldoc-echo-area-prefer-doc-buffer t)
+  (eldoc-documentation-strategy 'eldoc-documentation-compose)
+  :init
+  (global-eldoc-mode))
 
+;; Treesitter
+(use-package treesit
+  :custom
+  (treesit-enabled-modes t))
+
+;; Eglot
+(use-package eglot
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-documentation-renderer 'markdown-ts-view-mode)
+  (eglot-code-action-indications nil)
+  :hook
+  (c-mode-hook . eglot-ensure)
+  (c-ts-mode-hook . eglot-ensure))
+
+;; Whitespace
+(use-package whitespace
+  :hook
+  (before-save-hook . whitespace-cleanup))
+
+;; Eshell
 (use-package eshell
   :custom
   (eshell-banner-message "")
   :bind
-  ("C-c e" . bocker/eshell))
+  ("C-c e" . eshell))
 
-;;; org
+;; Corfu
+(use-package corfu
+  :ensure t
+  :init
+  (setq corfu-auto t
+        corfu-auto-delay 0.2
+        corfu-auto-trigger "."
+        corfu-quit-no-match 'separator)
+  (global-corfu-mode))
+
+;; Magit
+(use-package magit
+  :ensure t
+  :bind
+  ("C-c g" . magit))
+
+;; Electric pair
+(use-package electric-pair
+  :hook
+  (after-init-hook . electric-pair-mode))
+
+;; Org
 (use-package org
   :custom
   (org-edit-src-persistent-message)
@@ -293,27 +209,47 @@ If the buffer does not exist, create it using PROG and PROG-ARGS."
      ("X" . "export")
      ("q" . "quote")))
   :bind
-  ( :map org-mode-map
-    ("M-." . org-edit-special)
-    :map org-src-mode-map
-    ("M-," . org-edit-src-exit)))
+  (:map org-mode-map
+        ("M-." . org-edit-special)
+        :map org-src-mode-map
+        ("M-," . org-edit-src-exit)))
 
-;;; denote
-(use-package denote
+;; Theme
+(use-package ef-themes
   :ensure t
-  :hook (dired-mode . denote-dired-mode)
+  :init
+  (ef-themes-take-over-modus-themes-mode 1)
   :bind
-  (("C-c n n" . denote)
-   ("C-c n r" . denote-rename-file)
-   ("C-c n l" . denote-link)
-   ("C-c n b" . denote-backlinks)
-   ("C-c n d" . denote-dired)
-   ("C-c n g" . denote-grep))
+  ("<f1>" . 'modus-themes-toggle)
   :config
-  (setq denote-directory (expand-file-name "~/Documents/notes/"))
+  (setq modus-themes-mixed-fonts t)
+  (setq modus-themes-italic-constructs t)
+  (modus-themes-load-theme 'ef-cyprus))
 
-  ;; Automatically rename Denote buffers when opening them so that
-  ;; instead of their long file name they have, for example, a literal
-  ;; "[D]" followed by the file's title.  Read the doc string of
-  ;; `denote-rename-buffer-format' for how to modify this.
-  (denote-rename-buffer-mode 1))
+;; Persist minibuffer history
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; Minibuffer completion
+(use-package vertico
+  :ensure t
+  :custom
+  (vertico-scroll-margin 0)
+  :init
+  (vertico-mode))
+
+;; Minibuffer completion style
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-category-defaults nil)
+  (completion-pcm-leading-wildcard t))
+
+;; Minibuffer annotations
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode))
