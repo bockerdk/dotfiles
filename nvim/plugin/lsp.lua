@@ -12,7 +12,7 @@ vim.lsp.enable(lsp_configs)
 vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('bocker.lsp', {}),
     callback = function(args)
-        local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+        local client = assert(vim.lsp.get_clients({ id = args.data.client_id })[1])
 
         -- Folding
         -- if client:supports_method('textDocument/foldingRange') then

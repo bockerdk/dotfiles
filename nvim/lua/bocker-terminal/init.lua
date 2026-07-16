@@ -2,30 +2,18 @@ local config = require('bocker-terminal.config')
 
 local M = {}
 
--- Shared
-local term_win = nil
-
--- Persistent term
+local p_term_win = nil
 local p_term_buf = nil
 local p_create_new_term = false
 local p_term_leave_auto_cmd = nil
 
--- Run term
-local r_init_cmd = ""
 local r_term_buf = nil
+local r_init_cmd = ""
 local r_term_leave_auto_cmd = nil
 
 local cal_size = function(max, val)
-    -- Negative
-    if val < 0 then
-        return max - (math.abs(val) * 2)
-        -- Zero
-    elseif val == 0 then
-        return max
-        -- Percentage
-    elseif val > 0 and val <= 1 then
+    if val <= 1 then
         return math.floor(max * val)
-        -- Positive
     else
         return val
     end
@@ -42,31 +30,24 @@ local kill_term = function(buf, autocmd)
 end
 
 local create_window = function(buf)
-    local max_width = tonumber(vim.api.nvim_cmd({
-        cmd = 'echo', args = { '&columns' } }, { output = true }
-    )) - 2 --TODO: explain magic offset numbers
-    local max_height = tonumber(vim.api.nvim_cmd({
-        cmd = 'echo', args = { '&lines' } }, { output = true }
-    )) - 4 --TODO: explain magic offset numbers
+    local border_offset = config.options.border == 'none' and 0 or 2
+    local max_width = vim.o.columns - border_offset
+    local max_height = vim.o.lines - vim.o.cmdheight - border_offset
 
     local width = cal_size(max_width, config.options.width)
     local height = cal_size(max_height, config.options.height)
 
-    local col
+    local col = (max_width - width) / 2
     local row
-
     if config.options.anchor == 'm' then
-        col = (max_width - width) / 2
         row = (max_height - height) / 2
     elseif config.options.anchor == 't' then
-        col = (max_width - width) / 2
         row = 0
     elseif config.options.anchor == 'b' then
-        col = (max_width - width) / 2
-        row = (max_height - height)
+        row = max_height - height
     end
 
-    term_win = vim.api.nvim_open_win(buf, true, {
+    local win = vim.api.nvim_open_win(buf, true, {
         relative = 'editor',
         height = height,
         width = width,
@@ -75,26 +56,24 @@ local create_window = function(buf)
         border = config.options.border,
     })
 
-    vim.bo.buflisted = false
+    vim.bo[buf].buflisted = false
+    return win
 end
 
 local open_p_term = function(buf)
-    create_window(buf)
+    p_term_win = create_window(buf)
 
-    vim.cmd('startinsert')
-
-    -- If user deletes the buffer
     if p_create_new_term then
-        vim.cmd('startinsert')
         vim.cmd('terminal')
         p_create_new_term = false
     end
 
-    -- Close term if user focus other window (e.g. 'CTRL-w w')
+    vim.cmd('startinsert')
+
     p_term_leave_auto_cmd = vim.api.nvim_create_autocmd('WinLeave', {
         buffer = 0,
         callback = function()
-            bury_term(term_win, p_term_leave_auto_cmd)
+            bury_term(p_term_win, p_term_leave_auto_cmd)
         end
     })
 end
@@ -102,10 +81,9 @@ end
 local open_r_term = function(buf, cmd)
     create_window(buf)
 
+    vim.cmd('terminal ' .. cmd)
     vim.cmd('startinsert')
-    vim.fn.jobstart(cmd, { term = true })
 
-    -- Close term if user focus other window (e.g. 'CTRL-w w')
     r_term_leave_auto_cmd = vim.api.nvim_create_autocmd('WinLeave', {
         buffer = 0,
         callback = function()
@@ -114,9 +92,7 @@ local open_r_term = function(buf, cmd)
     })
 end
 
--- p all purpose term
-local toggle_p_term = function()
-    -- First toggle or user deleted terminal buffer
+M.toggle_p_term = function()
     if p_term_buf == nil
         or not vim.api.nvim_buf_is_valid(p_term_buf) then
         p_term_buf = vim.api.nvim_create_buf(false, false)
@@ -124,14 +100,18 @@ local toggle_p_term = function()
     end
 
     if p_term_buf == vim.api.nvim_get_current_buf() then
-        bury_term(term_win, p_term_leave_auto_cmd)
+        bury_term(p_term_win, p_term_leave_auto_cmd)
     else
         open_p_term(p_term_buf)
     end
 end
 
--- Run a single command and terminate term
-local toggle_r_term = function()
+M.toggle_r_term = function()
+    if r_init_cmd == "" then
+        vim.notify("No command set", vim.log.levels.ERROR)
+        return
+    end
+
     if r_term_buf == vim.api.nvim_get_current_buf() then
         kill_term(r_term_buf, r_term_leave_auto_cmd)
     else
@@ -140,31 +120,28 @@ local toggle_r_term = function()
     end
 end
 
-local set_init_cmd = function()
+M.set_cmd = function()
     vim.ui.input({ prompt = 'Enter command: ' }, function(input)
         r_init_cmd = input
     end)
 end
 
-M.setup = function(a, b, c, d, opts)
+M.setup = function(opts)
     config.setup(opts)
 
-    vim.keymap.set({ "n", "i", "v", "t" }, a, function()
-        toggle_p_term()
-    end)
-    -- vim.keymap.set({ "n", "i", "v", "t" }, b, function()
-    --     vim.ui.input({ prompt = 'Enter path: ' }, function(input)
-    --         p_term_path = input
-    --     end)
-    --     toggle_p_term()
-    -- end)
+    local keymaps = opts.keymaps or {}
 
-    vim.keymap.set({ "n", "i", "v", "t" }, c, toggle_r_term)
-    vim.keymap.set({ "n", "i", "v", "t" }, d,
-        function()
-            set_init_cmd()
-            toggle_r_term()
-        end)
+    if keymaps.persistent then
+        vim.keymap.set({ "n", "i", "v", "t" }, keymaps.persistent, M.toggle_p_term)
+    end
+
+    if keymaps.run then
+        vim.keymap.set({ "n", "i", "v", "t" }, keymaps.run, M.toggle_r_term)
+    end
+
+    if keymaps.set_cmd then
+        vim.keymap.set({ "n", "i", "v", "t" }, keymaps.set_cmd, M.set_cmd)
+    end
 end
 
 return M

@@ -8,8 +8,8 @@ time=$(date "+%H:%M")
 
 # Battery
 bat_file=/sys/class/power_supply/BAT0/capacity
-if [ -f $bat_file ]; then
-    bat_cap=$(cat $bat_file)
+if [ -f "$bat_file" ]; then
+    bat_cap=$(cat "$bat_file")
 else
     bat_cap="N/A"
 fi
@@ -29,7 +29,6 @@ if command -v brightnessctl > /dev/null; then
 else
     brightness="N/A"
 fi
-export CC
 
 echo -e "Brightness: $brightness\
     Battery: $bat_cap\

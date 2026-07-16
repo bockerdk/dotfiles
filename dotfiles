@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-# Check if command is availble
+# Check if command is available
 check_cmd () {
-    if command -v $1 &>/dev/null; then
+    if command -v "$1" &>/dev/null; then
         echo -e "  $1: ok";
     else
         echo -e "  $1: not found";
     fi
 }
 
-# Script must be run from inside it's directory
+# Script must be run from inside its directory
 if [ ! -f "$(basename "$0")" ]; then
-    echo "Script must be run from inside it's directory"
+    echo "Script must be run from inside its directory"
     exit 1
 fi
 
@@ -29,43 +29,48 @@ font_dir="$HOME/.local/share/fonts"
 wallpaper_dir="$HOME/.local/share/wallpapers"
 
 # Create config directory if missing
-mkdir -p $config_dir
+mkdir -p "$config_dir"
 # Create bin directory if missing
-mkdir -p $bin_dir
+mkdir -p "$bin_dir"
 # Create font directory if missing
-mkdir -p $font_dir
+mkdir -p "$font_dir"
 # Create wallpaper directory if missing
-mkdir -p $wallpaper_dir
+mkdir -p "$wallpaper_dir"
 
 # Resources
 echo "Installing resources"
 ## Fonts
 echo -e "  fonts"
-cp $PWD/res/fonts/* $font_dir
+cp "$PWD"/res/fonts/* "$font_dir"
 ## Wallpaper
 echo -e "  wallpapers"
-cp $PWD/res/wallpapers/* $wallpaper_dir
+cp "$PWD"/res/wallpapers/* "$wallpaper_dir"
+
+# Ghostty
+echo "Installing ghostty"
+check_cmd ghostty
+ln -snf "$PWD/ghostty" "$config_dir/"
 
 # Foot
 echo "Installing foot"
 check_cmd foot
-ln -snf $PWD/foot $config_dir/
+ln -snf "$PWD/foot" "$config_dir/"
 
 # Bash
 echo "Installing bash"
 check_cmd bash
-ln -snf $PWD/bash/.bash_profile $HOME/
-ln -snf $PWD/bash/.bashrc $HOME/
+ln -snf "$PWD/bash/.bash_profile" "$HOME/"
+ln -snf "$PWD/bash/.bashrc" "$HOME/"
 
 # Git
 echo "Installing git"
 check_cmd git
-ln -snf $PWD/git $config_dir/
+ln -snf "$PWD/git" "$config_dir/"
 
 # Neovim
 echo "Installing neovim"
 check_cmd nvim
-ln -snf $PWD/nvim $config_dir/
+ln -snf "$PWD/nvim" "$config_dir/"
 
 # Sway
 echo "Installing sway"
@@ -74,30 +79,35 @@ check_cmd swayidle
 check_cmd swaylock
 check_cmd swaybg
 check_cmd wmenu
-ln -snf $PWD/sway $config_dir/
+ln -snf "$PWD/sway" "$config_dir/"
 
 # Tmux
 echo "Installing tmux"
 check_cmd tmux
-ln -snf $PWD/tmux $config_dir/
-ln -snf $PWD/tmux/txs $HOME/.local/bin/
+check_cmd fzy
+ln -snf "$PWD/tmux" "$config_dir/"
+ln -snf "$PWD/tmux/txs" "$HOME/.local/bin/"
 
 # Emacs
-# echo "Installing emacs"
-# ln -snf $PWD/emacs $config_dir/
+echo "Installing emacs"
+check_cmd emacs
+ln -snf "$PWD/emacs" "$config_dir/"
 
 # GDB
 echo "Installing gdb"
 check_cmd gdb
-ln -snf $PWD/gdb $config_dir/
+ln -snf "$PWD/gdb" "$config_dir/"
 
-# Mail
-## Deps:
-##      mbsync
-##      msmtp
-##      notmuch
-##      systemd file
+# Opencode
+echo "Installing opencode"
+check_cmd opencode
+ln -snf "$PWD/opencode" "$config_dir/"
+
+# Scripts
+echo "Installing scripts"
+ln -snf "$PWD"/scripts/* "$HOME/.local/bin/"
 
 # Optional utilities
 echo "Checking for optional utilities"
 check_cmd jq
+check_cmd rg

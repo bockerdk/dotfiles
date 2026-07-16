@@ -1,1 +1,0 @@
-require("bocker-colorscheme").enable()
