@@ -2,8 +2,8 @@
 
 if [ "$(gsettings get org.gnome.desktop.interface color-scheme)" == "'prefer-dark'" ]; then
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
-    notify-send -a "Color Scheme" "Light mode"
+    # notify-send -a "Color Scheme" "Light mode"
 else
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
-    notify-send -a "Color Scheme" "Dark mode"
+    # notify-send -a "Color Scheme" "Dark mode"
 fi
