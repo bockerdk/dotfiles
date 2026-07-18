@@ -1,10 +1,15 @@
 local M = {}
 
 M.defaults = {
-    width = 0.9,
-    height = 0.9,
+    width = 1,
+    height = 1,
     anchor = 'm',
     border = 'single',
+    keymaps = {
+        persistent = "<F10>",
+        run = "<F11>",
+        set_cmd = "<C-F11>",
+    },
 }
 
 M.options = {}

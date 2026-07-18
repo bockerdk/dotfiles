@@ -5,6 +5,7 @@ vim.opt.wildoptions:append("fuzzy")
 -- vim.o.completeopt = "menu,menuone,popup,fuzzy,noselect"
 -- vim.o.autocomplete = false
 vim.opt.path:append({ ',**/*' })
+vim.opt.wildignore:append({ '*/build/*', '*/target/*', '*/node_modules/*', '*/.git/*' })
 vim.o.pumheight = 10
 vim.o.pumwidth = 50
 vim.o.pummaxwidth = 50
@@ -78,29 +79,17 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
 })
 
 -- Plugins
-require('bocker-terminal').setup({
-    width = 1,
-    height = 1,
-    keymaps = {
-        persistent = "<F10>",
-        run = "<F11>",
-        set_cmd = "<C-F11>",
-    },
-})
-
+require('bocker-terminal').setup()
 vim.pack.add({ 'https://github.com/kylechui/nvim-surround' })
-
+vim.pack.add({ 'https://github.com/github/copilot.vim' })
 vim.pack.add({ 'https://github.com/stevearc/oil.nvim' })
 require('oil').setup()
 vim.keymap.set("n", "-", "<Cmd>Oil<CR>")
-
 vim.pack.add({ 'https://github.com/nvim-mini/mini.completion' })
 require('mini.completion').setup()
-
 vim.pack.add({ 'https://github.com/catppuccin/nvim' })
 require('catppuccin').setup({
     flavour = 'auto',
-    transparent_background = false,
     integrations = {
         treesitter = true,
         native_lsp = { enabled = true },

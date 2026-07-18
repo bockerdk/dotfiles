@@ -129,7 +129,7 @@ end
 M.setup = function(opts)
     config.setup(opts)
 
-    local keymaps = opts.keymaps or {}
+    local keymaps = config.options.keymaps or {}
 
     if keymaps.persistent then
         vim.keymap.set({ "n", "i", "v", "t" }, keymaps.persistent, M.toggle_p_term)
