@@ -1,8 +1,7 @@
 -- Options
-vim.cmd.colorscheme('catppuccin')
 vim.opt.wildoptions:append("fuzzy")
 -- vim.o.complete = "o"
--- vim.o.completeopt = "menu,menuone,popup,fuzzy,noselect"
+vim.o.completeopt = "menu,menuone,popup,fuzzy,noselect"
 -- vim.o.autocomplete = false
 vim.opt.path:append({ ',**/*' })
 vim.opt.wildignore:append({ '*/build/*', '*/target/*', '*/node_modules/*', '*/.git/*' })
@@ -56,7 +55,6 @@ vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv")
 vim.keymap.set("n", "<A-o>", "<C-w>w")
 vim.keymap.set("n", "<leader>q", toggle_qf)
 vim.keymap.set("n", "<leader><leader>", "<C-^>")
-
 vim.keymap.set("n", "<leader>F", vim.lsp.buf.format)
 
 -- Autocmds
@@ -73,20 +71,20 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
     desc = "No newline auto comment",
     pattern = { '*' },
     callback = function()
-        vim.opt.formatoptions:remove('r')
-        vim.opt.formatoptions:remove('o')
+        vim.opt.formatoptions:remove({ 'r', 'o' })
     end
 })
 
 -- Plugins
 require('bocker-terminal').setup()
+
 vim.pack.add({ 'https://github.com/kylechui/nvim-surround' })
+
 vim.pack.add({ 'https://github.com/github/copilot.vim' })
+
 vim.pack.add({ 'https://github.com/stevearc/oil.nvim' })
 require('oil').setup()
-vim.keymap.set("n", "-", "<Cmd>Oil<CR>")
-vim.pack.add({ 'https://github.com/nvim-mini/mini.completion' })
-require('mini.completion').setup()
+
 vim.pack.add({ 'https://github.com/catppuccin/nvim' })
 require('catppuccin').setup({
     flavour = 'auto',

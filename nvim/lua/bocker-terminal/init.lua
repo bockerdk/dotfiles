@@ -30,7 +30,7 @@ local kill_term = function(buf, autocmd)
 end
 
 local create_window = function(buf)
-    local border_offset = config.options.border == 'none' and 0 or 2
+    local border_offset = 2
     local max_width = vim.o.columns - border_offset
     local max_height = vim.o.lines - vim.o.cmdheight - border_offset
 
@@ -53,7 +53,6 @@ local create_window = function(buf)
         width = width,
         col = col,
         row = row,
-        border = config.options.border,
     })
 
     vim.bo[buf].buflisted = false

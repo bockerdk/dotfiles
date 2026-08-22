@@ -4,7 +4,6 @@ M.defaults = {
     width = 1,
     height = 1,
     anchor = 'm',
-    border = 'single',
     keymaps = {
         persistent = "<F10>",
         run = "<F11>",
