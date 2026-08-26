@@ -1,0 +1,670 @@
+#+TITLE: Emacs config
+#+PROPERTY: header-args:emacs-lisp :tangle yes :results silent :lexical t
+#+STARTUP: content
+
+* Bootstrap
+Everything needed at the very start of the configuration.
+
+** Enable lexical binding
+When loading an Emacs Lisp file or evaluating an Emacs Lisp buffer,
+the 'lexical-binding' variable determines whether lexical or dynamic
+binding is used.
+
+When 'lexical-binding' is non-nil, variables use lexical binding. When
+it is nil, variables use dynamic binding.
+
+Lexical binding generally provides more predictable scoping and
+enables lexical closures. It is therefore the preferred choice for new
+Emacs Lisp code, although dynamic binding remains useful in some
+situations and is common in older Emacs Lisp code.
+
+We therefore enable lexical binding for this configuration.
+
+#+begin_src emacs-lisp
+  ;;; -*- lexical-binding: t; -*-
+#+end_src
+
+** Package management
+Set 'use-package' to never install anything implicitly. The
+'use-package' declaration must explicitly state the package should be
+installed (using :ensure t), else it is assumed it is already
+available.
+
+Additionally, disable 'use-package' hook suffix, as the ergonomic gain
+seems neglibile compared to the confusion it brings.
+
+#+begin_src emacs-lisp
+  (use-package use-package
+    :config
+    (setq use-package-always-ensure nil)
+    (setq use-package-hook-name-suffix nil))
+#+end_src
+
+Configure package archives
+
+#+begin_src emacs-lisp
+  (use-package package
+    :config
+    (setq package-archives
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+          ("melpa" . "https://melpa.org/packages/"))))
+#+end_src
+
+* Core
+Basic built-in functionality
+
+** Enable features
+By default some features are disabled, enable the good ones!
+
+*** Narrowing
+Enable narrowing features
+
+#+begin_src emacs-lisp
+  (mapc
+   (lambda (command)
+     (put command 'disabled nil))
+   '(narrow-to-region narrow-to-page))
+#+end_src
+
+** Disable features
+Disable features
+
+*** Feature 1
+TODO
+
+** Keymaps
+Keybindings for common actions and navigation.
+
+#+begin_src emacs-lisp
+  (keymap-global-set "C-x k" 'kill-current-buffer)
+  (keymap-global-set "M-o" 'other-window)
+  (keymap-global-set "C-c s" 'scratch-buffer)
+  (keymap-global-set "C-c Q" 'restart-emacs)
+  (keymap-global-set "M-u" 'upcase-dwim)
+  (keymap-global-set "M-l" 'downcase-dwim)
+  (keymap-global-set "M-c" 'capitalize-dwim)
+#+end_src
+
+** Custom file
+TODO
+
+Set custom file to avoid poluting the init file with custom
+settings. The custom file is never loaded, all settings should be set
+in the config file
+
+#+begin_src emacs-lisp
+  (setq custom-file (make-temp-file "emacs-custom-"))
+#+end_src
+
+** Startup
+Display scratch buffer on startup
+
+#+begin_src emacs-lisp
+  (setq initial-buffer-choice t)
+#+end_src
+
+** Catch-all
+TODO Remove section
+
+#+begin_src emacs-lisp
+  ;;; Formatting?
+  (setq fill-column 78)
+  (auto-fill-mode)
+
+  ;;; Basics
+  (setq use-short-answers t)
+
+  ;;; Editing
+  (setq kill-region-dwim 'emacs-word)
+  (setq-default indent-tabs-mode nil)
+
+  ;;; Rest
+  (setq next-screen-context-lines 10)
+  (setq tab-always-indent 'complete)
+
+  (setq exchange-point-and-mark-highlight-region nil)
+  (add-to-list 'save-some-buffers-action-alist
+               (list "d" (lambda (buffer)
+                           (diff-buffer-with-file (buffer-file-name buffer)))))
+#+end_src
+
+** Scratch buffer
+TODO
+
+#+begin_src emacs-lisp
+  (setq initial-scratch-message nil)
+#+end_src
+
+** Point
+Cursor appearance and behavior
+
+Draw block cursor as wide as the glyph under it
+
+#+begin_src emacs-lisp
+  (setq x-stretch-cursor t)
+#+end_src
+
+Disable blinking
+
+#+begin_src emacs-lisp
+  (blink-cursor-mode -1)
+#+end_src
+
+** Bell
+Disable bell functionality (no more BEEP!)
+
+#+begin_src emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+end_src
+
+** Backup/autosave/lockfiles
+Disable all everything
+
+#+begin_src emacs-lisp
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+  (setq create-lockfiles nil)
+#+end_src
+
+** Help
+Help windows
+
+Auto-select help windows
+
+#+begin_src emacs-lisp
+  (use-package help
+    :config
+    (setq help-window-select t))
+#+end_src
+
+** Winner
+Undo and redo window layout changes
+
+#+begin_src emacs-lisp
+  (use-package winner
+    :init
+    (winner-mode))
+#+end_src
+
+** Auto revert
+Automatically revert buffers when files change on disk
+
+#+begin_src emacs-lisp
+  (use-package autorevert
+    :init
+    (global-auto-revert-mode 1))
+#+end_src
+
+** Recent files
+Track and quickly access recently opened files
+
+#+begin_src emacs-lisp
+  (use-package recentf
+    :bind ("M-g r" . recentf)
+    :custom
+    (recentf-max-saved-items 100)
+    (recentf-max-menu-items 10)
+    :hook
+    (after-init-hook . recentf-mode))
+#+end_src
+
+** Imenu
+TODO
+
+Imenu should auto scan for document changes.
+
+Also change formatting to be a flat list with parent sections prefixed.
+
+#+begin_src emacs-lisp
+  (use-package imenu
+    :config
+    (setq imenu-auto-rescan t)
+    (setq imenu-flatten 'prefix))
+#+end_src
+
+* UI
+All the aesthetics
+
+** Frame
+Everything related to the frame
+
+Remove title bar
+
+#+begin_src emacs-lisp
+  (setq default-frame-alist '((undecorated . t)))
+#+end_src
+
+Remove menu-, tool-, and scrollbar
+
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+end_src
+
+** Theme
+The theme
+
+#+begin_src emacs-lisp
+  (use-package ef-themes
+    :ensure t
+    :init
+    (ef-themes-take-over-modus-themes-mode 1)
+    :config
+    (setq modus-themes-mixed-fonts t)
+    (setq modus-themes-variable-pitch-ui t)
+    (setq modus-themes-bold-constructs t)
+    (setq modus-themes-italic-constructs t)
+    (modus-themes-load-theme 'ef-cyprus))
+#+end_src
+
+** Modeline
+Modeline
+
+#+begin_src emacs-lisp
+  (column-number-mode)
+#+end_src
+
+** Font
+Set font types
+
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+                    :family "Aporetic Sans Mono"
+                      :height 120
+                    :weight 'regular)
+
+  (set-face-attribute 'variable-pitch nil
+                    :family "Aporetic Sans"
+                    :height 120
+                    :weight 'regular)
+
+  (set-face-attribute 'fixed-pitch nil
+                    :inherit 'default)
+#+end_src
+
+Enable variable (proportional) font when in 'text-mode'
+
+#+begin_src emacs-lisp
+  (add-hook 'text-mode-hook #'variable-pitch-mode)
+#+end_src
+
+* Editing
+General editing behavior
+
+** Electric pair
+Auto-insert matching delimiters
+
+#+begin_src emacs-lisp
+  (use-package electric-pair
+    :hook
+    (after-init-hook . electric-pair-mode))
+#+end_src
+
+** Whitespace
+Clean up trailing whitespace and blank lines before saving
+
+#+begin_src emacs-lisp
+  (use-package whitespace
+    :hook
+    (before-save-hook . whitespace-cleanup))
+#+end_src
+
+* Programming
+Everything related to programming
+
+** Git
+Git frontend
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind
+    ("C-c g" . magit))
+#+end_src
+
+** Compile
+Compilation buffer
+
+#+begin_src emacs-lisp
+  (use-package compile
+    :bind
+    ("<f12>" . compile)
+    :custom
+    (compilation-always-kill t)
+    (compilation-scroll-output t)
+    (ansi-color-for-compilation-mode t)
+    :hook
+    (compilation-filter-hook . ansi-color-compilation-filter))
+#+end_src
+
+** Eglot
+LSP integration
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :custom
+    (eglot-autoshutdown t)
+    (eglot-documentation-renderer 'markdown-ts-view-mode)
+    (eglot-code-action-indications nil)
+    :hook
+    (c-mode-hook . eglot-ensure)
+    (c-ts-mode-hook . eglot-ensure))
+#+end_src
+
+** Corfu
+In-buffer completion
+
+#+begin_src emacs-lisp
+  (use-package corfu
+    :ensure t
+    :init
+    (setq corfu-auto t)
+    (setq corfu-auto-delay 0.2)
+    (setq corfu-auto-trigger ".")
+    (setq corfu-quit-no-match 'separator)
+    (global-corfu-mode))
+#+end_src
+
+** Treesitter
+Tree-sitter parsing for syntax highlighting and structural editing
+
+#+begin_src emacs-lisp
+  (use-package treesit
+    :custom
+    (treesit-enabled-modes t))
+#+end_src
+
+** Eldoc
+Documentation lookup
+
+#+begin_src emacs-lisp
+  (use-package eldoc
+    :custom
+    (eldoc-echo-area-use-multiline-p nil)
+    (eldoc-echo-area-prefer-doc-buffer t)
+    (eldoc-documentation-strategy 'eldoc-documentation-compose)
+    :init
+    (global-eldoc-mode))
+#+end_src
+
+** Flymake
+On-the-fly diagnostics and navigation
+
+#+begin_src emacs-lisp
+  (use-package flymake
+    :bind
+    (:map flymake-mode-map
+          ("M-9" . flymake-show-buffer-diagnostics)
+          ("M-8" . flymake-goto-next-error)
+          ("M-7" . flymake-goto-prev-error)))
+#+end_src
+
+* Org
+TODO
+
+Overview
+
+Agenda files → actionable things
+Roam files → knowledge
+Roam daily → journal/thoughts
+
+Cheatsheet
+
+#+begin_src :tangle no
+  C-c c       → "I need to capture something"
+  C-c a       → "What do I need to do?"
+  C-c n f     → "I want a permanent knowledge note"
+  C-c n d     → "I want to record today"
+#+end_src
+
+File structure
+
+#+begin_src :tangle no
+  ~/org/
+  ├── agenda/
+  │   ├── inbox.org
+  │   ├── tasks.org
+  │   └── projects.org
+  │
+  └── roam/
+      ├── daily/
+      ├── emacs.org
+      ├── magit.org
+      └── ...
+#+end_src
+
+Create structure dirs and files
+
+#+begin_src emacs-lisp
+  (let ((dirs '("~/org/"
+                "~/org/agenda/"
+                "~/org/roam/"
+                "~/org/roam/daily/"))
+        (files '("~/org/agenda/inbox.org"
+                 "~/org/agenda/tasks.org"
+                 "~/org/agenda/projects.org")))
+
+    (dolist (dir dirs)
+      (unless (file-directory-p (expand-file-name dir))
+        (make-directory (expand-file-name dir) t)))
+
+    (dolist (file files)
+      (unless (file-exists-p (expand-file-name file))
+        (write-region "" nil (expand-file-name file)))))
+#+end_src
+
+Basic Org mode configuration (TODO: messy config vs custom clause)
+
+#+begin_src emacs-lisp
+  (use-package org
+    :config
+    (setq org-return-follows-link t)
+    (setq org-structure-template-alist
+          '(("s" . "src")
+            ("e" . "src emacs-lisp")
+            ("q" . "quote")))
+    (setq org-edit-src-persistent-message nil)
+    (setq org-directory "~/org/")
+    (setq org-agenda-files
+          '("~/org/agenda/inbox.org"
+            "~/org/agenda/tasks.org"
+            "~/org/agenda/projects.org"))
+    (setq org-log-done 'time)
+    :custom
+    (org-refile-targets
+     '(("~/org/agenda/tasks.org" :maxlevel . 3)
+       ("~/org/agenda/projects.org" :maxlevel . 4)))
+
+    ;; Show the outline path when choosing a target.
+    (org-refile-use-outline-path 'file)
+
+    ;; Make target completion easier to understand.
+    (org-outline-path-complete-in-steps nil)
+    :bind
+    ("C-c a" . org-agenda)
+    ("C-c c" . org-capture)
+    (:map org-mode-map
+          ("M-." . org-edit-special)
+          :map org-src-mode-map
+          ("M-," . org-edit-src-exit)))
+#+end_src
+
+** Org-capture
+TODO
+
+#+begin_src emacs-lisp
+  (use-package org-capture
+    :after org
+    :custom
+    (org-default-notes-file "~/org/agenda/inbox.org")
+    :config
+    (setq org-capture-templates
+          `(("t" "Todo"
+             entry
+             (file "~/org/agenda/inbox.org")
+             "* TODO %?\n  %U\n")
+            ("n" "Note"
+             entry
+             (file "~/org/agenda/inbox.org")
+             "* %?\n  %U\n")
+            ("b" "Book/article"
+             entry
+             (file "~/org/agenda/inbox.org")
+             "* %^{Title}\n  %U\n\n%?\n"))))
+#+end_src
+
+** Org-roam
+Interconnected Org notes
+
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :custom
+    (org-roam-directory "~/org/roam/")
+    :bind
+    (("C-c n f" . org-roam-node-find)
+     ("C-c n i" . org-roam-node-insert)
+     ("C-c n l" . org-roam-buffer-toggle))
+    :config
+    (org-roam-db-autosync-mode))
+#+end_src
+
+** Org-roam-dailies
+TODO
+
+#+begin_src emacs-lisp
+  (use-package org-roam-dailies
+    :custom
+    (org-roam-dailies-directory "daily/")
+    :bind
+    (("C-c n y" . org-roam-dailies-capture-yesterday)
+     ("C-c n Y" . org-roam-dailies-goto-yesterday)
+     ("C-c n d" . org-roam-dailies-capture-today)
+     ("C-c n D" . org-roam-dailies-goto-today)
+     ("C-c n t" . org-roam-dailies-capture-tomorrow)
+     ("C-c n T" . org-roam-dailies-goto-tomorrow)))
+#+end_src
+
+* Minibuffer
+Minibuffer behavior
+
+** Basics
+TODO
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :custom
+    ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
+    ;; to switch display modes.
+    (context-menu-mode t)
+    ;; Support opening new minibuffers from inside existing minibuffers.
+    (enable-recursive-minibuffers t)
+    ;; Hide commands in M-x which do not work in the current mode.  Vertico
+    ;; commands are hidden in normal buffers. This setting is useful beyond
+    ;; Vertico.
+    (read-extended-command-predicate #'command-completion-default-include-p)
+    ;; Do not allow the cursor in the minibuffer prompt
+    (minibuffer-prompt-properties
+     '(read-only t cursor-intangible t face minibuffer-prompt)))
+#+end_src
+
+** Save history
+Persist minibuffer history over Emacs restarts
+
+#+begin_src emacs-lisp
+  (use-package savehist
+    :init
+    (savehist-mode))
+#+end_src
+
+** Vertico
+Vertical completion UI for the minibuffer
+
+#+begin_src emacs-lisp
+  (use-package vertico
+    :ensure t
+    :init
+    (vertico-mode))
+
+#+end_src
+
+** Orderless
+Space-separated flexible completion matching
+
+#+begin_src emacs-lisp
+  (use-package orderless
+    :ensure t
+    :custom
+    ;; Configure a custom style dispatcher (see the Consult wiki)
+    ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
+    ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles partial-completion))))
+    (completion-category-defaults nil) ;; Disable defaults, use our settings
+    (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+#+end_src
+
+** Marginalia
+Annotations in completion candidates
+
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :ensure t
+    :init
+    (marginalia-mode))
+#+end_src
+
+* Tools
+Built-in utilities and everyday applications
+
+** Proced
+Process list viewer
+
+#+begin_src emacs-lisp
+  (use-package proced
+    :custom
+    (proced-enable-color-flag t)
+    (proced-tree-flag t)
+    (proced-auto-update-flag nil)
+    (proced-descent t)
+    (proced-filter 'user))
+#+end_src
+
+** Calendar
+Calendar
+
+#+begin_src emacs-lisp
+  (use-package calendar
+    :custom
+    (calendar-week-start-day 1)
+    (calendar-date-style 'european))
+#+end_src
+
+** Dired
+File manager
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :hook
+    ((dired-mode-hook . dired-hide-details-mode)
+     (dired-mode-hook . hl-line-mode)
+     (dired-mode-hook . auto-revert-mode))
+    :custom
+    (dired-recursive-copies 'always)
+    (dired-recursive-deletes 'always)
+    (dired-kill-when-opening-new-dired-buffer t)
+    (dired-dwim-target t))
+#+end_src
+
+** Eshell
+Emacs Lisp shell
+
+#+begin_src emacs-lisp
+  (use-package eshell
+    :custom
+    (eshell-banner-message "")
+    :bind
+    ("C-c e" . eshell))
+#+end_src
